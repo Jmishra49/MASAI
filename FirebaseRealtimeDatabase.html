@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Firebase Realtime Users</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+    h1 {
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .error {
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>User List from Firebase</h1>
+  <div id="output"></div>
+  <div id="error" class="error"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <script>
+    // TODO: Replace with your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Fetch users
+    function fetchUsers() {
+      db.ref("users").get()
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            const users = snapshot.val();
+            displayUsers(users);
+          } else {
+            document.getElementById("error").innerText = "No data found.";
+          }
+        })
+        .catch(error => {
+          document.getElementById("error").innerText = "Error fetching data: " + error.message;
+        });
+    }
+
+    // Display users in a table
+    function displayUsers(users) {
+      const table = document.createElement("table");
+      const headerRow = `<tr><th>Name</th><th>Email</th></tr>`;
+      table.innerHTML = headerRow;
+
+      for (let key in users) {
+        const user = users[key];
+        const row = `<tr><td>${user.name}</td><td>${user.email}</td></tr>`;
+        table.innerHTML += row;
+      }
+
+      document.getElementById("output").appendChild(table);
+    }
+
+    // On load
+    window.onload = fetchUsers;
+  </script>
+</body>
+</html>
