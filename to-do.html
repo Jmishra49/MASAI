@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Todos with Pagination</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .todo {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 5px 0;
+    }
+    .pagination {
+      margin-top: 20px;
+    }
+    .pagination button {
+      margin: 0 3px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Todos with Pagination</h1>
+  <div id="todo-container"></div>
+  <div class="pagination" id="pagination-buttons"></div>
+
+  <script>
+    const todosContainer = document.getElementById("todo-container");
+    const paginationButtons = document.getElementById("pagination-buttons");
+
+    let currentPage = 1;
+    const todosPerPage = 10;
+
+    // Fetch and display todos for a specific page
+    async function fetchTodos(page) {
+      const start = (page - 1) * todosPerPage;
+      const url = `https://jsonplaceholder.typicode.com/todos?_start=${start}&_limit=${todosPerPage}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        renderTodos(data);
+        currentPage = page;
+      } catch (error) {
+        todosContainer.innerHTML = `<p style="color:red;">Failed to fetch todos</p>`;
+      }
+    }
+
+    // Render todos to the DOM
+    function renderTodos(todos) {
+      todosContainer.innerHTML = "";
+      todos.forEach(todo => {
+        const div = document.createElement("div");
+        div.className = "todo";
+        div.innerHTML = `
+          <strong>${todo.id}. ${todo.title}</strong><br>
+          Completed: ${todo.completed ? "✅" : "❌"}
+        `;
+        todosContainer.appendChild(div);
+      });
+    }
+
+    // Render pagination buttons
+    function setupPagination() {
+      const totalTodos = 200; // from the API's static limit
+      const totalPages = Math.ceil(totalTodos / todosPerPage);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.addEventListener("click", () => fetchTodos(i));
+        paginationButtons.appendChild(btn);
+      }
+    }
+
+    // Initial load
+    window.onload = () => {
+      setupPagination();
+      fetchTodos(currentPage);
+    };
+  </script>
+</body>
+</html>
