@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="polls"></div>
+    <h2>hello</h2>
+
+    <script>
+        async function fetchPolls() {
+            const res = await fetch('https://opentdb.com/api.php?amount=3&type=multiple');
+            const data = await res.json();
+            console.log(data.results);
+            render(data.results);
+        }
+        function render(ques){
+            const pollsDiv = document.getElementById("polls");
+            polls.innerHTML = "";
+
+            ques.forEach((q, idx)=>{
+                const qKey = `poll-${idx}`;
+                const saveVote = localStorage.getItem(qKey);
+                const option = [...q.incorrect_answers, q.correct_answer].sort();
+
+                const container = document.createElement("div");
+                container.innerHTML = `<h4>${q.ques}</h4>`;
+
+                option.forEach(opt => {
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = qKey;
+                    radio.value = opt;
+                    if(saveVote === opt) radio.checked = true;
+
+                    container.appendChild(radio);
+                    container.appendChild(document.createTextNode(opt));
+                    container.appendChild(document.createElement("br"));
+
+
+                });
+                const button = document.createElement("button");
+                button.textContent("Vote");
+
+                if(saveVote) button.disabled = true;
+                button.addEventListener("click", ()=> {
+                    const selected = document.querySelector(`input[name="${qKey}"]:checked`);
+                    if(!selected){
+                        return;
+                    }
+                })
+                container.appendChild(button);
+
+                const results = document.createElement("div");
+
+                results.id =  `${qKey}-result`;
+                container.appendChild(results);
+                pollsDiv.appendChild(container);
+
+                showResult(qKey, option);
+            });
+        }
+        function updateVoteCount(key, option){
+            const votes = JSON.parse(localStorage.getItem(`${key}-votes`)|| '{}');
+            votes[option] = (votes[option]|| 0)+1;
+            localStorage.setItem(`${key}-votes`, JSON.stringify(votes));
+            showResult(key, Object.keys(votes));
+
+        }
+        function showResult(key, option){
+            const votes = JSON.parse(localStorage.getItem(`${key}-votes`) ||)
+        }
+
+
+    </script>
+</body>
+</html>

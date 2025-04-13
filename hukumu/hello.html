@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+    <textarea id="comment" placeholder="Write ....."></textarea><br>
+
+    <button onclick="sumitCommnet()" id="submitBtn">Submit</button>
+</div>
+<div id="output"></div>
+    <script>
+        let typingTimer;
+        const commnetBox = document.getElementById("commnet");
+        commnetBox.addEventListener("input", {}=> {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(()=>{
+                sumitCommnet();
+            }, 5000);
+        });
+
+        function sumitCommnet() {
+            const comment = commnetBox.value;
+            const outputDiv = document.getElementById("output");
+
+            if(commnet.trim() === ""){
+                outputDiv.textContent = "Please write something";
+                outputDiv.style.color = "green";
+            }
+        }
+    </script>
+</body>
+</html>
