@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throttled Image Slider</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #slider-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        #slider-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        button {
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        #slide-number {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        #alert {
+            margin-top: 20px;
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Throttled Image Slider</h1>
+    <div id="slider-container">
+        <img id="slider-image" src="" alt="Image Slider">
+        <div class="buttons">
+            <button id="prev-btn">Previous</button>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+    <p id="slide-number"></p>
+    <p id="alert">Chill chill, loading it!!</p>
+
+    <script>
+        let currentSlide = 0;  // Keeps track of the current image index
+        let lastClickTime = 0; // Stores the time of the last click
+        let clickCount = 0; // Counts the number of clicks within the last second
+
+        // Function to fetch and update the image based on the currentSlide index
+        function updateImage() {
+            const imageUrl = `https://picsum.photos/600/400?random=${currentSlide}`;
+            document.getElementById('slider-image').src = imageUrl;
+            document.getElementById('slide-number').innerText = `Slide: ${currentSlide + 1}`;
+        }
+
+        // Throttle function to restrict the rate of clicks
+        function throttle(func, delay) {
+            return function () {
+                const currentTime = new Date().getTime();
+                if (currentTime - lastClickTime > delay) {
+                    lastClickTime = currentTime;
+                    clickCount = 1;
+                    func();
+                } else {
+                    clickCount++;
+                    if (clickCount > 3) {
+                        // Show the alert if clicked more than 3 times in 1 second
+                        document.getElementById('alert').style.display = 'block';
+                    } else {
+                        document.getElementById('alert').style.display = 'none';
+                    }
+                }
+            };
+        }
+
+        // Function to move to the next image
+        function nextImage() {
+            currentSlide++;
+            updateImage();
+        }
+
+        // Function to move to the previous image
+        function prevImage() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateImage();
+            }
+        }
+
+        // Add event listeners to buttons with throttling applied
+        document.getElementById('next-btn').addEventListener('click', throttle(nextImage, 1000));
+        document.getElementById('prev-btn').addEventListener('click', throttle(prevImage, 1000));
+
+        // Initial call to load the first image
+        updateImage();
+    </script>
+</body>
+</html>
